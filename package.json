@@ -11,7 +11,10 @@
     "url": "https://github.com/Jason2866/pioarduino-vscode-debug.git"
   },
   "scripts": {
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@vscode/debugadapter": "^1.68.0",
@@ -19,8 +22,13 @@
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.0.0",
     "@types/vscode": "~1.82.0",
+    "jest": "^30.3.0",
+    "js-yaml": "^4.1.1",
+    "ts-jest": "^29.4.6",
     "ts-loader": "^9.5.4",
     "typescript": "^5.9.3",
     "webpack": "~5.105.4",
