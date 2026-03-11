@@ -1,4 +1,3 @@
-import * as copyPaste from 'copy-paste';
 import * as vscode from 'vscode';
 import { NumberFormat, SymbolScope } from './common';
 import { encodeDisassembly } from './utils';
@@ -287,7 +286,7 @@ class PlatformIODebugExtension {
     private peripheralsCopyValue(node: any): void {
         const value = node.node.getCopyValue();
         if (value) {
-            copyPaste.copy(value);
+            vscode.env.clipboard.writeText(value);
         }
     }
 
@@ -311,7 +310,7 @@ class PlatformIODebugExtension {
     private registersCopyValue(node: any): void {
         const value = node.node.getCopyValue();
         if (value) {
-            copyPaste.copy(value);
+            vscode.env.clipboard.writeText(value);
         }
     }
 

@@ -16,8 +16,7 @@ module.exports = [
         },
         externals: {
             vscode: 'vscode',
-            'copy-paste': 'copy-paste',
-            'vscode-debugadapter': 'vscode-debugadapter',
+            '@vscode/debugadapter': '@vscode/debugadapter',
             xml2js: 'xml2js',
         },
         resolve: {
@@ -47,8 +46,7 @@ module.exports = [
         },
         externals: {
             vscode: 'vscode',
-            'copy-paste': 'copy-paste',
-            'vscode-debugadapter': 'vscode-debugadapter',
+            '@vscode/debugadapter': '@vscode/debugadapter',
             xml2js: 'xml2js',
         },
         resolve: {

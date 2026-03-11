@@ -14,7 +14,7 @@ import {
     Scope,
     Source,
     ContinuedEvent,
-} from 'vscode-debugadapter';
+} from '@vscode/debugadapter';
 import { StoppedEvent, AdapterOutputEvent } from '../common';
 import { hexFormat, encodeDisassembly, parseQuery } from '../utils';
 import { VariableObject, MIError } from './mi2/types';

@@ -215,7 +215,7 @@ export class FieldNode extends BaseNode {
 }
 
 export class RegisterTreeProvider implements vscode.TreeDataProvider<TreeNode> {
-    private _onDidChangeTreeData = new vscode.EventEmitter<TreeNode>();
+    private _onDidChangeTreeData = new vscode.EventEmitter<void>();
     public onDidChangeTreeData = this._onDidChangeTreeData.event;
     private loaded: boolean = false;
     private viewExpanded: boolean = false;

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 export class DisassemblyTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
-    private _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem>();
+    private _onDidChangeTreeData = new vscode.EventEmitter<void>();
     public onDidChangeTreeData = this._onDidChangeTreeData.event;
     private forced: boolean = false;
 

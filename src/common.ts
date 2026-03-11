@@ -1,4 +1,4 @@
-import { Event } from 'vscode-debugadapter';
+import { Event } from '@vscode/debugadapter';
 
 export enum NumberFormat {
     Auto = 0,
