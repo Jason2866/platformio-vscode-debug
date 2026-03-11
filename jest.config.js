@@ -6,6 +6,9 @@ module.exports = {
     '**/*.ts',
     '!**/node_modules/**',
     '!**/dist/**',
+    '!**/*.test.ts',
+    '!**/*.spec.ts',
+    '!**/*.d.ts',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
 };
