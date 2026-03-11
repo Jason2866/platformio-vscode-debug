@@ -2,6 +2,9 @@
  * Formats a number as a zero-padded hexadecimal string.
  */
 export function hexFormat(value: number, padding: number = 8, includePrefix: boolean = true): string {
+/**
+ * Formats a number as a zero-padded hexadecimal string.
+ */
     let result = value.toString(16);
     while (result.length < padding) {
         result = '0' + result;
@@ -18,6 +21,9 @@ export function binaryFormat(
     includePrefix: boolean = true,
     groupByNibble: boolean = false
 ): string {
+/**
+ * Formats a number as a binary string, with optional nibble grouping.
+ */
     let result = (value >>> 0).toString(2);
     while (result.length < padding) {
         result = '0' + result;
@@ -40,6 +46,9 @@ export function binaryFormat(
  * Creates a bitmask covering the specified bit range.
  */
 export function createMask(offset: number, width: number): number {
+/**
+ * Creates a bitmask covering the specified bit range.
+ */
     let mask = 0;
     const end = offset + width - 1;
     for (let i = offset; i <= end; i++) {
@@ -52,6 +61,9 @@ export function createMask(offset: number, width: number): number {
  * Extracts a bit field from a value.
  */
 export function extractBits(value: number, offset: number, width: number): number {
+/**
+ * Extracts a bit field from a value.
+ */
     return ((value & createMask(offset, width)) >>> offset) >>> 0;
 }
 
@@ -59,6 +71,9 @@ export function extractBits(value: number, offset: number, width: number): numbe
  * Parses a URL query string into a key-value map.
  */
 export function parseQuery(queryString: string): { [key: string]: string } {
+/**
+ * Parses a URL query string into a key-value map.
+ */
     const params: { [key: string]: string } = {};
     const pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&');
     for (const pair of pairs) {
@@ -72,6 +87,9 @@ export function parseQuery(queryString: string): { [key: string]: string } {
  * Encodes a function name and source file into a disassembly:// URI.
  */
 export function encodeDisassembly(name: string, file: string): string {
+/**
+ * Encodes a function name and source file into a disassembly:// URI.
+ */
     let uri = 'disassembly:///';
     if (file) {
         uri += `${file}:`;

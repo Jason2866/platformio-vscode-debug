@@ -23,6 +23,7 @@ export class TreeNode extends vscode.TreeItem {
             title: 'Selected Node',
         };
     }
+/** TreeItem for registers panel. */
 }
 
 /** Base for register tree nodes. */
@@ -47,6 +48,7 @@ export class BaseNode {
     setFormat(format: NumberFormat): void {
         this.format = format;
     }
+/** Base for register tree nodes. */
 }
 
 /** CPU register node; may have FieldNode children. */
@@ -85,6 +87,7 @@ export class RegisterNode extends BaseNode {
         this.currentValue = 0;
     }
 
+    /** CPU register node; may have FieldNode children. */
     extractBits(offset: number, width: number): number {
         return extractBits(this.currentValue, offset, width);
     }
@@ -153,6 +156,7 @@ export class RegisterNode extends BaseNode {
         }
         return settings;
     }
+/** Named bit-field within special registers. */
 }
 
 /** Named bit-field within special registers. */
@@ -217,6 +221,7 @@ export class FieldNode extends BaseNode {
         }
         return null;
     }
+/** TreeDataProvider for platformio-debug.registers. */
 }
 
 /** TreeDataProvider for platformio-debug.registers. */

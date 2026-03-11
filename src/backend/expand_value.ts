@@ -16,6 +16,7 @@ export function isExpandable(value: string): number {
         return 0;
     }
     if (value.startsWith('{...}')) {
+        /** Determines if a value string is expandable. */
         return 2;
     }
     if (value[0] === '{') {
@@ -39,6 +40,7 @@ export function expandValue(
     root: string = '',
     extra?: any
 ): any {
+    /** Parses a GDB value string into a DAP variable tree. */
     const parseQuotedString = (): string => {
         value = value.trim();
         if (value[0] !== '"' && value[0] !== "'") {

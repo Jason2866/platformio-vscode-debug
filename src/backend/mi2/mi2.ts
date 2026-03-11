@@ -33,6 +33,7 @@ export class MI2 extends EventEmitter {
         super();
     }
 
+    /** Spawns GDB and sends startup MI commands. */
     connect(cwd: string, commands: string[]): Promise<boolean> {
         return new Promise((resolve, reject) => {
             const args = [...this.args];
@@ -67,6 +68,7 @@ export class MI2 extends EventEmitter {
         });
     }
 
+    /** Buffers and dispatches stdout lines. */
     stdout(data: any): void {
         this.buffer += typeof data === 'string' ? data : data.toString('utf8');
         const newlineIndex = this.buffer.lastIndexOf('\n');
@@ -81,6 +83,7 @@ export class MI2 extends EventEmitter {
         }
     }
 
+    /** Buffers and logs stderr lines. */
     stderr(data: any): void {
         this.errbuf += typeof data === 'string' ? data : data.toString('utf8');
         const newlineIndex = this.errbuf.lastIndexOf('\n');
@@ -94,6 +97,7 @@ export class MI2 extends EventEmitter {
         }
     }
 
+    /** Splits and logs multi-line stderr. */
     onOutputStderr(output: string): void {
         const lines = output.split('\n');
         lines.forEach((line) => {
@@ -101,6 +105,7 @@ export class MI2 extends EventEmitter {
         });
     }
 
+    /** Handles partial line; logs non-MI output. */
     onOutputPartial(line: string): boolean {
         if (isPlainOutput(line)) {
             this.logNoNewLine('stdout', line);
@@ -109,6 +114,7 @@ export class MI2 extends EventEmitter {
         return false;
     }
 
+    /** Parses and routes MI output lines. */
     onOutput(output: string): void {
         const lines = output.split('\n');
         lines.forEach((line) => {
@@ -208,6 +214,7 @@ export class MI2 extends EventEmitter {
         });
     }
 
+    /** Sends -gdb-exit; optional force-kill after 1s. */
     stop(forceKill: boolean = false): void {
         if (forceKill) {
             const proc = this.process;
@@ -221,6 +228,7 @@ export class MI2 extends EventEmitter {
         this.sendRaw('-gdb-exit');
     }
 
+    /** Sends -target-detach with fallback kill. */
     detach(): void {
         const proc = this.process;
         const killTimeout = setTimeout(() => {
@@ -232,6 +240,7 @@ export class MI2 extends EventEmitter {
         this.sendRaw('-target-detach');
     }
 
+    /** Interrupts a thread. */
     interrupt(threadId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             this.sendCommand(`exec-interrupt --thread ${threadId}`).then(
@@ -243,6 +252,7 @@ export class MI2 extends EventEmitter {
         });
     }
 
+    /** Continues a thread. */
     continue(threadId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             this.sendCommand(`exec-continue --thread ${threadId}`).then(
@@ -254,6 +264,7 @@ export class MI2 extends EventEmitter {
         });
     }
 
+    /** Steps to next line/instruction. */
     next(threadId: number, instruction: boolean): Promise<boolean> {
         return new Promise((resolve, reject) => {
             const command = instruction ? 'exec-next-instruction' : 'exec-next';
@@ -266,6 +277,7 @@ export class MI2 extends EventEmitter {
         });
     }
 
+    /** Steps into next line/instruction. */
     step(threadId: number, instruction: boolean): Promise<boolean> {
         return new Promise((resolve, reject) => {
             const command = instruction ? 'exec-step-instruction' : 'exec-step';
@@ -278,6 +290,7 @@ export class MI2 extends EventEmitter {
         });
     }
 
+    /** Steps out of current function. */
     stepOut(threadId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             this.sendCommand(`exec-finish --thread ${threadId}`).then(
@@ -289,6 +302,7 @@ export class MI2 extends EventEmitter {
         });
     }
 
+    /** Restarts by sending MI commands. */
     restart(commands: string[]): Promise<boolean> {
         return this._sendCommandSequence(commands);
     }

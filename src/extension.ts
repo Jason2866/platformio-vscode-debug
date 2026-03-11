@@ -9,6 +9,9 @@ import { MemoryTreeProvider } from './frontend/memory_tree_provider';
 import { PeripheralTreeProvider, RecordType as PeripheralRecordType } from './frontend/peripheral';
 import { RegisterTreeProvider, RecordType as RegisterRecordType } from './frontend/registers';
 
+/**
+ * Main entry point and controller for the PlatformIO Debug VS Code extension.
+ */
 class PlatformIODebugExtension {
     private adapterOutputChannel: vscode.OutputChannel = null;
     private functionSymbols: any[] = null;
