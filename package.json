@@ -1,7 +1,7 @@
 {
   "name": "pioarduino-vscode-debug",
-  "version": "1.0.0",
-  "description": "pioarduino debugger for VSCode",
+  "version": "1.1.0",
+  "description": "pioarduino debugger for VSCode with MI3/MI4 support",
   "main": "dist/extension.js",
   "engines": {
     "vscode": "^1.82.0"
