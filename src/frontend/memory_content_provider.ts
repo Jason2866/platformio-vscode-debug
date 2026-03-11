@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { hexFormat, parseQuery } from '../utils';
 
+/** TextDocumentContentProvider for examinememory://. */
 export class MemoryContentProvider implements vscode.TextDocumentContentProvider {
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
     public onDidChange = this._onDidChange.event;
@@ -19,6 +20,7 @@ export class MemoryContentProvider implements vscode.TextDocumentContentProvider
         dark: { borderColor: 'lightblue' },
     });
 
+    /** Returns hex+ASCII memory dump for the URI. */
     provideTextDocumentContent(uri: vscode.Uri): Thenable<string> {
         return new Promise((resolve, reject) => {
             const params = parseQuery(uri.query);
@@ -83,10 +85,12 @@ export class MemoryContentProvider implements vscode.TextDocumentContentProvider
         });
     }
 
+    /** Triggers a content refresh. */
     update(document: vscode.TextDocument): void {
         this._onDidChange.fire(document.uri);
     }
 
+    /** Maps editor position to byte offset. */
     getOffset(position: vscode.Position): number | undefined {
         if (position.line < 1 || position.character < this.firstBytePos) {
             return;
@@ -104,6 +108,7 @@ export class MemoryContentProvider implements vscode.TextDocumentContentProvider
         return offset;
     }
 
+    /** Maps byte offset to editor position. */
     getPosition(offset: number, isAscii: boolean = false): vscode.Position {
         const line = 1 + Math.floor(offset / 16);
         let character = offset % 16;
@@ -115,6 +120,7 @@ export class MemoryContentProvider implements vscode.TextDocumentContentProvider
         return new vscode.Position(line, character);
     }
 
+    /** Builds ranges for a contiguous byte range. */
     getRanges(startOffset: number, endOffset: number, isAscii: boolean): vscode.Range[] {
         const startPos = this.getPosition(startOffset, isAscii);
         let endPos = this.getPosition(endOffset, isAscii);
@@ -133,6 +139,7 @@ export class MemoryContentProvider implements vscode.TextDocumentContentProvider
         return ranges;
     }
 
+    /** Applies decorations for the selected range. */
     handleSelection(event: vscode.TextEditorSelectionChangeEvent): void {
         const lineCount = event.textEditor.document.lineCount;
         if (

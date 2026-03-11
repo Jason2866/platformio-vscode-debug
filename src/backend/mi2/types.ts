@@ -30,6 +30,7 @@ export class VariableObject {
     applyChanges(node: any): void {
         this.value = MINode.valueOf(node, 'value');
         if (MINode.valueOf(node, 'type_changed')) {
+            /** Applies a -var-update changelist entry. */
             this.type = MINode.valueOf(node, 'new_type');
         }
         this.dynamic = !!MINode.valueOf(node, 'dynamic');
@@ -40,6 +41,7 @@ export class VariableObject {
     isCompound(): boolean {
         return (
             this.numchild > 0 ||
+            /** True if this variable has children. */
             this.value === '{...}' ||
             (this.dynamic && (this.displayhint === 'array' || this.displayhint === 'map'))
         );
@@ -48,6 +50,7 @@ export class VariableObject {
     toProtocolVariable(): any {
         return {
             name: this.exp,
+            /** Converts to DAP Variable. */
             evaluateName: this.fullExp || this.exp,
             value: this.value === undefined ? '<unknown>' : this.value,
             type: this.type,
@@ -76,6 +79,7 @@ export class MIError {
 
     toString(): string {
         return `${(this as any).message} (from ${(this as any).source})`;
+        /** Returns "<message> (from <source>)". */
     }
 }
 

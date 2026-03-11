@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
 import { parseQuery } from '../utils';
 
+/** TextDocumentContentProvider for disassembly://. */
 export class DisassemblyContentProvider implements vscode.TextDocumentContentProvider {
+    /** Returns formatted disassembly text for the requested function. */
     provideTextDocumentContent(uri: vscode.Uri, token: vscode.CancellationToken): Thenable<string> {
         return new Promise((resolve, reject) => {
             const params = parseQuery(uri.query);
@@ -24,6 +26,7 @@ export class DisassemblyContentProvider implements vscode.TextDocumentContentPro
         });
     }
 
+    /** Right-pads a string to the target length. */
     private padEnd(targetLength: number, str: string): string {
         for (let i = str.length; i < targetLength; i++) {
             str += ' ';

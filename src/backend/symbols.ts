@@ -20,6 +20,7 @@ const SCOPE_MAP: { [key: string]: SymbolScope } = {
     '!': SymbolScope.Both,
 };
 
+/** Describes a single objdump --syms entry. */
 export interface SymbolInformation {
     address: number;
     type: SymbolType;
@@ -32,6 +33,7 @@ export interface SymbolInformation {
     hidden: boolean;
 }
 
+/** Loads/queries symbols from an ELF via objdump. */
 export class SymbolTable {
     private symbols: SymbolInformation[] = [];
 
@@ -40,6 +42,7 @@ export class SymbolTable {
         private executable: string
     ) {}
 
+    /** Runs objdump and populates internal symbol list. */
     loadSymbols(): void {
         let objdumpPath = '';
         fs.readdirSync(this.toolchainBinDir).forEach((file) => {
@@ -109,6 +112,7 @@ export class SymbolTable {
         }
     }
 
+    /** Returns function symbol containing address. */
     getFunctionAtAddress(address: number): SymbolInformation | undefined {
         const matches = this.symbols.filter(
             (sym) =>
@@ -121,16 +125,19 @@ export class SymbolTable {
         }
     }
 
+    /** Returns all function symbols. */
     getFunctionSymbols(): SymbolInformation[] {
         return this.symbols.filter((sym) => sym.type === SymbolType.Function);
     }
 
+    /** Returns all global object symbols. */
     getGlobalVariables(): SymbolInformation[] {
         return this.symbols.filter(
             (sym) => sym.type === SymbolType.Object && sym.scope === SymbolScope.Global
         );
     }
 
+    /** Returns file-local object symbols. */
     getStaticVariables(file: string): SymbolInformation[] {
         return this.symbols.filter(
             (sym) =>
@@ -140,6 +147,7 @@ export class SymbolTable {
         );
     }
 
+    /** Looks up function by name (local first). */
     getFunctionByName(name: string, file: string): SymbolInformation | null {
         let matches = this.symbols.filter(
             (sym) =>

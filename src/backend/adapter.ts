@@ -23,6 +23,7 @@ import { MI2 } from './mi2/mi2';
 import { MINode } from './mi_parse';
 import { SymbolTable } from './symbols';
 
+/** Wraps a variable reference with options. */
 class ExtendedVariable {
     constructor(
         public name: string,
@@ -45,6 +46,7 @@ class CustomContinuedEvent extends Event {
     }
 }
 
+/** DAP implementation on top of GDB/MI2. */
 export class GDBDebugSession extends DebugSession {
     private variableHandles = new Handles<string | VariableObject | ExtendedVariable>(131072);
     private variableHandlesReverse: { [name: string]: number } = {};
@@ -68,6 +70,7 @@ export class GDBDebugSession extends DebugSession {
         super(debuggerLinesStartAt1, isServer);
     }
 
+    /** Attaches MI2 listeners and sends InitializedEvent. */
     initDebugger(): void {
         this.miDebugger.on('launcherror', this.launchError.bind(this));
         this.miDebugger.on('quit', this.quitEvent.bind(this));
@@ -85,6 +88,7 @@ export class GDBDebugSession extends DebugSession {
         this.sendEvent(new InitializedEvent());
     }
 
+    /** Responds to DAP initialize with capabilities. */
     protected initializeRequest(response: any, args: any): void {
         response.body.supportsConditionalBreakpoints = true;
         response.body.supportsConfigurationDoneRequest = true;
@@ -98,16 +102,19 @@ export class GDBDebugSession extends DebugSession {
         this.sendResponse(response);
     }
 
+    /** Handles DAP launch request. */
     protected launchRequest(response: any, args: any): void {
         this.args = args;
         this.processLaunchAttachRequest(response, false);
     }
 
+    /** Handles DAP attach request. */
     protected attachRequest(response: any, args: any): void {
         this.args = args;
         this.processLaunchAttachRequest(response, true);
     }
 
+    /** Core launch/attach handler. */
     private processLaunchAttachRequest(response: any, isAttach: boolean): void {
         this.quit = false;
         this.attached = false;
@@ -168,6 +175,7 @@ export class GDBDebugSession extends DebugSession {
             );
     }
 
+    /** Handles custom DAP requests. */
     protected customRequest(command: string, response: any, args: any): void {
         switch (command) {
             case 'set-force-disassembly':
@@ -238,6 +246,7 @@ export class GDBDebugSession extends DebugSession {
         }
     }
 
+    /** Handles disassemble custom request. */
     protected async disassembleRequest(response: any, args: any): Promise<void> {
         if (args.function) {
             try {
@@ -282,6 +291,7 @@ export class GDBDebugSession extends DebugSession {
         }
     }
 
+    /** Gets/caches function disassembly. */
     private async getDisassemblyForFunction(functionName: string, file: string): Promise<any> {
         const func = this.symbolTable.getFunctionByName(functionName, file);
         if (!func) {
@@ -309,6 +319,7 @@ export class GDBDebugSession extends DebugSession {
         return func;
     }
 
+    /** Gets disassembly for address range. */
     private async getDisassemblyForAddresses(startAddress: number, length: number): Promise<any[]> {
         const endAddress = startAddress + length;
         const result = await this.miDebugger.sendCommand(
@@ -324,6 +335,7 @@ export class GDBDebugSession extends DebugSession {
         }));
     }
 
+    /** Reads memory via MI. */
     private customReadMemoryRequest(response: any, address: number, length: number): void {
         this.miDebugger.examineMemory(address, length).then(
             (data) => {
@@ -342,6 +354,7 @@ export class GDBDebugSession extends DebugSession {
         );
     }
 
+    /** Writes memory via MI. */
     private customWriteMemoryRequest(response: any, address: number, data: string): void {
         const hexAddr = hexFormat(address, 8);
         this.miDebugger.sendCommand(`data-write-memory-bytes ${hexAddr} ${data}`).then(
@@ -355,6 +368,7 @@ export class GDBDebugSession extends DebugSession {
         );
     }
 
+    /** Reads CPU registers via MI. */
     private customReadRegistersRequest(response: any): void {
         this.miDebugger.sendCommand('data-list-register-values x').then(
             (result) => {
@@ -379,6 +393,7 @@ export class GDBDebugSession extends DebugSession {
         );
     }
 
+    /** Reads register names via MI. */
     private customReadRegisterListRequest(response: any): void {
         this.miDebugger.sendCommand('data-list-register-names').then(
             (result) => {
@@ -402,6 +417,7 @@ export class GDBDebugSession extends DebugSession {
         );
     }
 
+    /** Handles DAP disconnect. */
     protected disconnectRequest(response: any, args: any): void {
         if (this.miDebugger) {
             if (this.attached) {
@@ -413,6 +429,7 @@ export class GDBDebugSession extends DebugSession {
         this.sendResponse(response);
     }
 
+    /** Handles DAP terminate. */
     protected terminateRequest(response: any, args: any): void {
         if (this.miDebugger) {
             this.miDebugger.stop();
@@ -420,6 +437,7 @@ export class GDBDebugSession extends DebugSession {
         this.sendResponse(response);
     }
 
+    /** Handles DAP restart. */
     protected restartRequest(response: any, args: any): void {
         const doRestart = () => {
             this.miDebugger
@@ -448,10 +466,12 @@ export class GDBDebugSession extends DebugSession {
         }
     }
 
+    /** Emits adapter output event. */
     private handleAdapterOutput(text: string): void {
         this.sendEvent(new AdapterOutputEvent(text, 'out'));
     }
 
+    /** Forwards GDB console/log messages. */
     private handleMsg(type: string, message: string): void {
         if (type === 'target') {
             type = 'stdout';
@@ -462,12 +482,14 @@ export class GDBDebugSession extends DebugSession {
         this.sendEvent(new OutputEvent(message, type));
     }
 
+    /** Emits continued events. */
     private handleRunning(info: any): void {
         this.stopped = false;
         this.sendEvent(new ContinuedEvent(this.currentThreadId, true));
         this.sendEvent(new CustomContinuedEvent(this.currentThreadId, true));
     }
 
+    /** Emits stopped events for breakpoints. */
     private handleBreakpoint(info: any): void {
         const threadId = parseInt(info.record('thread-id') || this.currentThreadId);
         this.stopped = true;
@@ -476,6 +498,7 @@ export class GDBDebugSession extends DebugSession {
         this.sendEvent(new CustomStopEvent('breakpoint', threadId));
     }
 
+    /** Emits stopped events for step end. */
     private handleBreak(info: any): void {
         this.stopped = true;
         this.stoppedReason = 'step';
@@ -483,6 +506,7 @@ export class GDBDebugSession extends DebugSession {
         this.sendEvent(new CustomStopEvent('step', this.currentThreadId));
     }
 
+    /** Emits stopped events for user pause. */
     private handlePause(info: any): void {
         this.stopped = true;
         this.stoppedReason = 'user request';
@@ -490,19 +514,23 @@ export class GDBDebugSession extends DebugSession {
         this.sendEvent(new CustomStopEvent('user request', this.currentThreadId));
     }
 
+    /** Emits thread started. */
     private handleThreadCreated(info: any): void {
         this.sendEvent(new ThreadEvent('started', info.threadId));
     }
 
+    /** Emits thread exited. */
     private handleThreadExited(info: any): void {
         this.sendEvent(new ThreadEvent('exited', info.threadId));
     }
 
+    /** Emits thread selected. */
     private handleThreadSelected(info: any): void {
         this.currentThreadId = info.threadId;
         this.sendEvent(new ThreadEvent('selected', info.threadId));
     }
 
+    /** Handles unexpected stop. */
     private stopEvent(info: any): void {
         if (!this.started) {
             this.crashed = true;
@@ -515,16 +543,19 @@ export class GDBDebugSession extends DebugSession {
         }
     }
 
+    /** Handles GDB quit. */
     private quitEvent(): void {
         this.quit = true;
         this.sendEvent(new TerminatedEvent());
     }
 
+    /** Handles launch error. */
     private launchError(err: any): void {
         this.handleMsg('stderr', `Could not start debugger process > ${err.toString()}\n`);
         this.quitEvent();
     }
 
+    /** Handles function breakpoints. */
     protected setFunctionBreakPointsRequest(response: any, args: any): void {
         if (!args.breakpoints || !args.breakpoints.length) {
             return;
@@ -579,6 +610,7 @@ export class GDBDebugSession extends DebugSession {
         }
     }
 
+    /** Handles source/disassembly breakpoints. */
     protected setBreakPointsRequest(response: any, args: any): void {
         const setBreakpoints = async (shouldContinue: boolean) => {
             this.debugReady = true;

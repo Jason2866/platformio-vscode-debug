@@ -1,5 +1,6 @@
 const OCTAL_ESCAPE_REGEX = /^[0-7]{3}/;
 
+/** Represents a parsed GDB/MI message. */
 export class MINode {
     public token: number;
     public outOfBandRecord: any[];
@@ -11,6 +12,7 @@ export class MINode {
         this.resultRecords = resultRecords;
     }
 
+    /** Traverses an MI result tree via path. */
     static valueOf(startNode: any, path: string): any {
         if (!startNode) {
             return undefined;
@@ -70,12 +72,14 @@ export class MINode {
         return current;
     }
 
+    /** Gets value from out-of-band output via path. */
     record(path: string): any {
         if (this.outOfBandRecord) {
             return MINode.valueOf(this.outOfBandRecord[0].output, path);
         }
     }
 
+    /** Gets value from result record via path. */
     result(path: string): any {
         if (this.resultRecords) {
             return MINode.valueOf(this.resultRecords.results, path);
@@ -174,6 +178,7 @@ function parseCString(str: string): string {
     return buffer.slice(0, offset).toString('utf8');
 }
 
+/** Parses a GDB/MI line into a MINode. */
 export function parseMI(output: string): MINode {
     let token: number;
     const outOfBandRecords: any[] = [];
